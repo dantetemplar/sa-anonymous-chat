@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+
+        .message {
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #e0e0e0;
+            position: relative;
+        }
+
+        .message .tooltiptext {
+            visibility: hidden;
+            padding: 0.25em 0.5em;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 0.25em;
+            white-space: nowrap;
+
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+            top: 100%;
+            left: 10%;
+            transition-property: visibility;
+            transition-delay: 0s;
+        }
+
+        .message:hover .tooltiptext {
+            visibility: visible;
+            transition-delay: 0.3s;
+        }
+
+        form {
+            display: flex;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div style="display:flex; align-items: center">
+        <h1 style="flex-grow:1">Anonymous Chat</h1>
+        <div id="message-count">0 messages</div>
+    </div>
+    <div id="chat-box">
+        <!-- Chat messages will be displayed here -->
+    </div>
+    <form id="message-form">
+        <input type="text" id="message-input" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+</div>
+
+<script>
+    let lastMessageIndex = 0;
+
+    async function fetchMessages() {
+        await fetchMessageCount();
+        const response = await fetch('/api/messages');
+        const messages = await response.json();
+        const chatBox = document.getElementById('chat-box');
+        messages.forEach((msg, id) => {
+            if (id < lastMessageIndex) {
+                return;  // Skip messages that have already been displayed
+            }
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.textContent = msg.text;
+            const tooltipElement = document.createElement('span');
+            tooltipElement.className = 'tooltiptext';
+            tooltipElement.textContent = new Date(msg.timestamp).toLocaleString();
+
+            messageElement.appendChild(tooltipElement)
+            chatBox.appendChild(messageElement);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to bottom
+        lastMessageIndex = messages.length;
+    }
+
+    async function fetchMessageCount() {
+        const response = await fetch('/api/messages/count');
+        const messagesCount = await response.text();
+        document.getElementById('message-count').textContent = `${messagesCount} messages`;
+    }
+
+    async function sendMessage(message) {
+        await fetch('/api/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `message=${encodeURIComponent(message)}`,
+        });
+        await fetchMessages();  // Refresh chat after sending a message
+    }
+
+    document.getElementById('message-form').addEventListener('submit', function (event) {
+        event.preventDefault();  // Prevent the form from submitting the traditional way
+        const messageInput = document.getElementById('message-input');
+        const message = messageInput.value.trim();
+        if (message) {
+            sendMessage(message);
+            messageInput.value = '';  // Clear input field after sending
+        }
+    });
+
+    // Fetch chat messages every 2 seconds
+    setInterval(fetchMessages, 200);
+    fetchMessages();  // Initial fetch
+</script>
+</body>
+</html>
