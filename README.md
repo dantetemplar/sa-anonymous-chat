@@ -41,7 +41,15 @@ This is the API and frontend for anonymous chat
    ```
    OR using uvicorn directly
    ```bash
-   poetry run uvicorn src.api.app:app --use-colors --proxy-headers --forwarded-allow-ips=*
+   poetry run uvicorn src.api.app:app
+   ```
+   OR using granian
+   ```bash
+    granian --opt --workers 8 --interface asgi src.api.app:app
+   ```
+   OR in docker
+   ```bash
+   docker compose up --build
    ```
 
 Now the API is running on http://localhost:8000/docs. Good job!

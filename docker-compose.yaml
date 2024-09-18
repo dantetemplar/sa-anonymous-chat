@@ -1,0 +1,11 @@
+# Run all services:
+# docker compose up --build --detach
+
+services:
+  api:
+    build: . # See Dockerfile for more details
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./chat.sqlite3:/code/chat.sqlite3:rw"

@@ -7,13 +7,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = "^0.115.0"
 uvicorn = "^0.30.6"
 pyyaml = "^6.0.2"
 colorlog = "^6.8.2"
 fastapi-swagger = "^0.2.3"
 python-multipart = "^0.0.9"
 jinja2 = "^3.1.4"
+granian = "^1.6.0"
+fastapi = "^0.115.0"
 
 
 [build-system]

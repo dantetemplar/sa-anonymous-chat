@@ -43,6 +43,11 @@ async def message_count() -> int:
     return chat_instance.get_message_count()
 
 
+@app.delete("/api/messages")
+async def delete_all_messages() -> None:
+    chat_instance.delete_all_messages()
+
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse(request, name="index.html", context={})

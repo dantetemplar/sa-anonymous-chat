@@ -125,7 +125,8 @@
             messageElement.appendChild(tooltipElement)
             chatBox.appendChild(messageElement);
         });
-        chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to bottom
+        if (lastMessageIndex !== messages.length)
+            chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to bottom
         lastMessageIndex = messages.length;
     }
 
